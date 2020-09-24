@@ -12,7 +12,7 @@ namespace csharpcore
 
     public abstract class ShopItem : Item
     {
-        protected static readonly int MaxQuality = 50;
+        public static readonly int MaxQuality = 50;
 
         public void DecreaseSellIn()
         {
@@ -49,7 +49,10 @@ namespace csharpcore
 
     public class EpicItem : Item
     {
-        public void BeholdMyEpicness() {}
+        public void BeholdMyEpicness()
+        {
+            Quality = 80;
+        }
     }
 
     public class ConcertTicket : ShopItem

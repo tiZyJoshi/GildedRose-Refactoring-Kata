@@ -14,6 +14,10 @@ namespace csharpcore
         {
             foreach (var item in Items)
             {
+                if (item is EpicItem epicItem)
+                {
+                    epicItem.BeholdMyEpicness();
+                }
                 if(!(item is ShopItem shopItem))
                 {
                     continue;
