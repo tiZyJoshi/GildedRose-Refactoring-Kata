@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.InteropServices;
 
 namespace csharpcore
 {
@@ -47,9 +46,9 @@ namespace csharpcore
         }
     }
 
-    public class EpicItem : Item
+    public class LegendaryItem : Item
     {
-        public void BeholdMyEpicness()
+        public void IamLegend()
         {
             Quality = 80;
         }
@@ -57,8 +56,8 @@ namespace csharpcore
 
     public class ConcertTicket : ShopItem
     {
-        private static readonly int CloseSellIn = 11;
-        private static readonly int VeryCloseSellIn = 6;
+        private const int CloseSellIn = 11;
+        private const int VeryCloseSellIn = 6;
 
         private int GetAggration()
         {

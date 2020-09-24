@@ -50,9 +50,9 @@ namespace csharpcore
         // - All items have a Quality value which denotes how valuable the item is
         // - At the end of each day our system lowers both values for every item
         [Fact]
-        public void testDegradingItem()
+        public void TestDegradingItem()
         {
-            IList<Item> Items = new List<Item>
+            IList<Item> items = new List<Item>
             {
                 new DegradingItem
                 {
@@ -61,17 +61,17 @@ namespace csharpcore
                     Quality = 1
                 }
             };
-            GildedRose app = new GildedRose(Items);
+            GildedRose app = new GildedRose(items);
             app.UpdateQuality();
-            Assert.Equal(0, Items[0].SellIn);
-            Assert.Equal(0, Items[0].Quality);
+            Assert.Equal(0, items[0].SellIn);
+            Assert.Equal(0, items[0].Quality);
         }
 
         // - Once the sell by date has passed, Quality degrades twice as fast
         [Fact]
-        public void testDegradingItemSellDatePassed()
+        public void TestDegradingItemSellDatePassed()
         {
-            IList<Item> Items = new List<Item>
+            IList<Item> items = new List<Item>
             {
                 new DegradingItem
                 {
@@ -80,16 +80,16 @@ namespace csharpcore
                     Quality = 2
                 }
             };
-            GildedRose app = new GildedRose(Items);
+            GildedRose app = new GildedRose(items);
             app.UpdateQuality();
-            Assert.Equal(0, Items[0].Quality);
+            Assert.Equal(0, items[0].Quality);
         }
 
         // - The Quality of an item is never negative
         [Fact]
-        public void testQualityNeverNegative()
+        public void TestQualityNeverNegative()
         {
-            IList<Item> Items = new List<Item>
+            IList<Item> items = new List<Item>
             {
                 new DegradingItem
                 {
@@ -103,7 +103,7 @@ namespace csharpcore
                     SellIn = 0,
                     Quality = 0
                 },
-                new EpicItem
+                new LegendaryItem
                 {
                     Name = "foo",
                     SellIn = 0,
@@ -122,20 +122,20 @@ namespace csharpcore
                     Quality = 0
                 }
             };
-            GildedRose app = new GildedRose(Items);
+            GildedRose app = new GildedRose(items);
             app.UpdateQuality();
-            Assert.True(Items[0].Quality > -1);
-            Assert.True(Items[1].Quality > -1);
-            Assert.True(Items[2].Quality > -1);
-            Assert.True(Items[3].Quality > -1);
-            Assert.True(Items[4].Quality > -1);
+            Assert.True(items[0].Quality > -1);
+            Assert.True(items[1].Quality > -1);
+            Assert.True(items[2].Quality > -1);
+            Assert.True(items[3].Quality > -1);
+            Assert.True(items[4].Quality > -1);
         }
 
         // - "Aged Brie" actually increases in Quality the older it gets
         [Fact]
-        public void testAgedItem()
+        public void TestAgedItem()
         {
-            IList<Item> Items = new List<Item>
+            IList<Item> items = new List<Item>
             {
                 new AgedItem
                 {
@@ -144,17 +144,17 @@ namespace csharpcore
                     Quality = 1
                 }
             };
-            GildedRose app = new GildedRose(Items);
+            GildedRose app = new GildedRose(items);
             app.UpdateQuality();
-            Assert.Equal(2, Items[0].Quality);
+            Assert.Equal(2, items[0].Quality);
         }
 
         // - The Quality of an item is never more than 50
         // (unless its an epic)
         [Fact]
-        public void testQualityNeverGreaterMaxQuality()
+        public void TestQualityNeverGreaterMaxQuality()
         {
-            IList<Item> Items = new List<Item>
+            IList<Item> items = new List<Item>
             {
                 new DegradingItem
                 {
@@ -181,40 +181,40 @@ namespace csharpcore
                     Quality = 0
                 }
             };
-            GildedRose app = new GildedRose(Items);
+            GildedRose app = new GildedRose(items);
             app.UpdateQuality();
-            Assert.True(Items[0].Quality <= ShopItem.MaxQuality);
-            Assert.True(Items[1].Quality <= ShopItem.MaxQuality);
-            Assert.True(Items[2].Quality <= ShopItem.MaxQuality);
-            Assert.True(Items[3].Quality <= ShopItem.MaxQuality);
+            Assert.True(items[0].Quality <= ShopItem.MaxQuality);
+            Assert.True(items[1].Quality <= ShopItem.MaxQuality);
+            Assert.True(items[2].Quality <= ShopItem.MaxQuality);
+            Assert.True(items[3].Quality <= ShopItem.MaxQuality);
         }
 
         // - "Sulfuras", being a legendary item, never has to be sold or decreases in Quality
         //Just for clarification, an item can never have its Quality increase above 50, however "Sulfuras" is a
         //legendary item and as such its Quality is 80 and it never alters.
         [Fact]
-        public void testEpicItem()
+        public void TestEpicItem()
         {
-            IList<Item> Items = new List<Item>
+            IList<Item> items = new List<Item>
             {
-                new EpicItem
+                new LegendaryItem
                 {
                     Name = "foo",
                     SellIn = 2,
                     Quality = 1
                 }
             };
-            GildedRose app = new GildedRose(Items);
+            GildedRose app = new GildedRose(items);
             app.UpdateQuality();
-            Assert.Equal(2, Items[0].SellIn);
-            Assert.Equal(80, Items[0].Quality);
+            Assert.Equal(2, items[0].SellIn);
+            Assert.Equal(80, items[0].Quality);
         }
 
         // - "Backstage passes", like aged brie, increases in Quality as its SellIn value approaches;
         [Fact]
-        public void testConcertTicketNormal()
+        public void TestConcertTicketNormal()
         {
-            IList<Item> Items = new List<Item>
+            IList<Item> items = new List<Item>
             {
                 new ConcertTicket
                 {
@@ -223,17 +223,17 @@ namespace csharpcore
                     Quality = 10
                 }
             };
-            GildedRose app = new GildedRose(Items);
+            GildedRose app = new GildedRose(items);
             app.UpdateQuality();
 
-            Assert.Equal(11, Items[0].Quality);
+            Assert.Equal(11, items[0].Quality);
         }
 
         // Quality increases by 2 when there are 10 days or less and by 3 when there are 5 days or less but
         [Fact]
-        public void testConcertTicketCloseSellIn()
+        public void TestConcertTicketCloseSellIn()
         {
-            IList<Item> Items = new List<Item>
+            IList<Item> items = new List<Item>
             {
                 new ConcertTicket
                 {
@@ -242,17 +242,17 @@ namespace csharpcore
                     Quality = 10
                 }
             };
-            GildedRose app = new GildedRose(Items);
+            GildedRose app = new GildedRose(items);
             app.UpdateQuality();
 
-            Assert.Equal(12, Items[0].Quality);
+            Assert.Equal(12, items[0].Quality);
         }
 
         // Quality drops to 0 after the concert
         [Fact]
-        public void testConcertTicketVeryCloseSellIn()
+        public void TestConcertTicketVeryCloseSellIn()
         {
-            IList<Item> Items = new List<Item>
+            IList<Item> items = new List<Item>
             {
                 new ConcertTicket
                 {
@@ -261,17 +261,17 @@ namespace csharpcore
                     Quality = 10
                 }
             };
-            GildedRose app = new GildedRose(Items);
+            GildedRose app = new GildedRose(items);
             app.UpdateQuality();
 
-            Assert.Equal(13, Items[0].Quality);
+            Assert.Equal(13, items[0].Quality);
         }
 
         // - "Conjured" items degrade in Quality twice as fast as normal items
         [Fact]
-        public void testConjuredItem()
+        public void TestConjuredItem()
         {
-            IList<Item> Items = new List<Item>
+            IList<Item> items = new List<Item>
             {
                 new ConjuredItem
                 {
@@ -280,16 +280,16 @@ namespace csharpcore
                     Quality = 2
                 }
             };
-            GildedRose app = new GildedRose(Items);
+            GildedRose app = new GildedRose(items);
             app.UpdateQuality();
-            Assert.Equal(0, Items[0].Quality);
+            Assert.Equal(0, items[0].Quality);
         }
 
         // - Once the sell by date has passed, Quality degrades twice as fast
         [Fact]
-        public void testConjuredItemSellDatePassed()
+        public void TestConjuredItemSellDatePassed()
         {
-            IList<Item> Items = new List<Item>
+            IList<Item> items = new List<Item>
             {
                 new ConjuredItem
                 {
@@ -298,9 +298,9 @@ namespace csharpcore
                     Quality = 4
                 }
             };
-            GildedRose app = new GildedRose(Items);
+            GildedRose app = new GildedRose(items);
             app.UpdateQuality();
-            Assert.Equal(0, Items[0].Quality);
+            Assert.Equal(0, items[0].Quality);
         }
     }
 }
