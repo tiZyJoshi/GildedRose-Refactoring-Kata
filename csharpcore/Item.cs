@@ -22,7 +22,7 @@ namespace csharpcore
 
     public class DegradingItem : ShopItem
     {
-        protected virtual int GetDegration()
+        protected virtual int LookUpQualityDecrease()
         {
             if (SellIn < 0)
             {
@@ -32,17 +32,27 @@ namespace csharpcore
             return 1;
         }
 
-        public void Degrade()
+        public void DecreaseQuality()
         {
-            Quality = Math.Max(0, Quality - GetDegration());
+            Quality = Math.Max(0, Quality - LookUpQualityDecrease());
         }
     }
 
     public class AgedItem : ShopItem
     {
+        public int LookUpQualityIncrease()
+        {
+            if (SellIn < 0)
+            {
+                return 2;
+            }
+
+            return 1;
+        }
+
         public void AgeFurther()
         {
-            Quality = Math.Min(MaxQuality, Quality + 1);
+            Quality = Math.Min(MaxQuality, Quality + LookUpQualityIncrease());
         }
     }
 
@@ -59,7 +69,7 @@ namespace csharpcore
         private const int CloseSellIn = 11;
         private const int VeryCloseSellIn = 6;
 
-        private int GetAggration()
+        private int LookUpQualityDelta()
         {
             if (SellIn < VeryCloseSellIn)
             {
@@ -74,7 +84,7 @@ namespace csharpcore
             return 1;
         }
 
-        public void Aggrade()
+        public void IncreaseQuality()
         {
             if (SellIn < 0)
             {
@@ -82,15 +92,15 @@ namespace csharpcore
                 return;
             }
 
-            Quality = Math.Min(MaxQuality, Quality + GetAggration());
+            Quality = Math.Min(MaxQuality, Quality + LookUpQualityDelta());
         }
     }
 
     public class ConjuredItem : DegradingItem
     {
-        protected override int GetDegration()
+        protected override int LookUpQualityDecrease()
         {
-            return base.GetDegration()*2;
+            return base.LookUpQualityDecrease()*2;
         }
     }
 }

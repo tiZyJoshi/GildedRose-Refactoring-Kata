@@ -61,7 +61,7 @@ namespace csharpcore
                     Quality = 1
                 }
             };
-            GildedRose app = new GildedRose(items);
+            var app = new GildedRose(items);
             app.UpdateQuality();
             Assert.Equal(0, items[0].SellIn);
             Assert.Equal(0, items[0].Quality);
@@ -80,7 +80,7 @@ namespace csharpcore
                     Quality = 2
                 }
             };
-            GildedRose app = new GildedRose(items);
+            var app = new GildedRose(items);
             app.UpdateQuality();
             Assert.Equal(0, items[0].Quality);
         }
@@ -122,7 +122,7 @@ namespace csharpcore
                     Quality = 0
                 }
             };
-            GildedRose app = new GildedRose(items);
+            var app = new GildedRose(items);
             app.UpdateQuality();
             Assert.True(items[0].Quality > -1);
             Assert.True(items[1].Quality > -1);
@@ -144,7 +144,7 @@ namespace csharpcore
                     Quality = 1
                 }
             };
-            GildedRose app = new GildedRose(items);
+            var app = new GildedRose(items);
             app.UpdateQuality();
             Assert.Equal(2, items[0].Quality);
         }
@@ -181,7 +181,7 @@ namespace csharpcore
                     Quality = 0
                 }
             };
-            GildedRose app = new GildedRose(items);
+            var app = new GildedRose(items);
             app.UpdateQuality();
             Assert.True(items[0].Quality <= ShopItem.MaxQuality);
             Assert.True(items[1].Quality <= ShopItem.MaxQuality);
@@ -204,7 +204,7 @@ namespace csharpcore
                     Quality = 1
                 }
             };
-            GildedRose app = new GildedRose(items);
+            var app = new GildedRose(items);
             app.UpdateQuality();
             Assert.Equal(2, items[0].SellIn);
             Assert.Equal(80, items[0].Quality);
@@ -223,7 +223,7 @@ namespace csharpcore
                     Quality = 10
                 }
             };
-            GildedRose app = new GildedRose(items);
+            var app = new GildedRose(items);
             app.UpdateQuality();
 
             Assert.Equal(11, items[0].Quality);
@@ -242,7 +242,7 @@ namespace csharpcore
                     Quality = 10
                 }
             };
-            GildedRose app = new GildedRose(items);
+            var app = new GildedRose(items);
             app.UpdateQuality();
 
             Assert.Equal(12, items[0].Quality);
@@ -261,7 +261,7 @@ namespace csharpcore
                     Quality = 10
                 }
             };
-            GildedRose app = new GildedRose(items);
+            var app = new GildedRose(items);
             app.UpdateQuality();
 
             Assert.Equal(13, items[0].Quality);
@@ -280,7 +280,7 @@ namespace csharpcore
                     Quality = 2
                 }
             };
-            GildedRose app = new GildedRose(items);
+            var app = new GildedRose(items);
             app.UpdateQuality();
             Assert.Equal(0, items[0].Quality);
         }
@@ -298,7 +298,7 @@ namespace csharpcore
                     Quality = 4
                 }
             };
-            GildedRose app = new GildedRose(items);
+            var app = new GildedRose(items);
             app.UpdateQuality();
             Assert.Equal(0, items[0].Quality);
         }

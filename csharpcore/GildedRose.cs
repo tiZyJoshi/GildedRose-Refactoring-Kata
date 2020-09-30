@@ -4,7 +4,8 @@ namespace csharpcore
 {
     public class GildedRose
     {
-        readonly IList<Item> _items;
+        private readonly IList<Item> _items;
+
         public GildedRose(IList<Item> items)
         {
             _items = items;
@@ -17,22 +18,26 @@ namespace csharpcore
                 if (item is LegendaryItem legendaryItem)
                 {
                     legendaryItem.IamLegend();
+                    continue;
                 }
+
                 if(!(item is ShopItem shopItem))
                 {
                     continue;
                 }
+
                 shopItem.DecreaseSellIn();
+
                 switch (shopItem)
                 {
                     case DegradingItem degradingItem:
-                        degradingItem.Degrade();
+                        degradingItem.DecreaseQuality();
                         break;
                     case AgedItem agedItem:
                         agedItem.AgeFurther();
                         break;
                     case ConcertTicket concertTicket:
-                        concertTicket.Aggrade();
+                        concertTicket.IncreaseQuality();
                         break;
                 }
             }
