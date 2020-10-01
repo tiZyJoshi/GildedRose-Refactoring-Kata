@@ -1,5 +1,7 @@
-﻿using Xunit;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using Xunit;
 
 namespace csharpcore
 {
@@ -14,24 +16,24 @@ namespace csharpcore
     //Leeroy, who has moved on to new adventures. Your task is to add the new feature to our system so that
     //we can begin selling a new category of items. First an introduction to our system:
 
-	   // - All items have a SellIn value which denotes the number of days we have to sell the item
-	   // - All items have a Quality value which denotes how valuable the item is
-	   // - At the end of each day our system lowers both values for every item
+    // - All items have a SellIn value which denotes the number of days we have to sell the item
+    // - All items have a Quality value which denotes how valuable the item is
+    // - At the end of each day our system lowers both values for every item
 
     //Pretty simple, right? Well this is where it gets interesting:
 
-	   // - Once the sell by date has passed, Quality degrades twice as fast
-	   // - The Quality of an item is never negative
-	   // - "Aged Brie" actually increases in Quality the older it gets
-	   // - The Quality of an item is never more than 50
-	   // - "Sulfuras", being a legendary item, never has to be sold or decreases in Quality
-	   // - "Backstage passes", like aged brie, increases in Quality as its SellIn value approaches;
-	   // Quality increases by 2 when there are 10 days or less and by 3 when there are 5 days or less but
-	   // Quality drops to 0 after the concert
+    // - Once the sell by date has passed, Quality degrades twice as fast
+    // - The Quality of an item is never negative
+    // - "Aged Brie" actually increases in Quality the older it gets
+    // - The Quality of an item is never more than 50
+    // - "Sulfuras", being a legendary item, never has to be sold or decreases in Quality
+    // - "Backstage passes", like aged brie, increases in Quality as its SellIn value approaches;
+    // Quality increases by 2 when there are 10 days or less and by 3 when there are 5 days or less but
+    // Quality drops to 0 after the concert
 
     //We have recently signed a supplier of conjured items. This requires an update to our system:
 
-	   // - "Conjured" items degrade in Quality twice as fast as normal items
+    // - "Conjured" items degrade in Quality twice as fast as normal items
 
     //Feel free to make any changes to the UpdateQuality method and add any new code as long as everything
     //still works correctly. However, do not alter the Item class or Items property as those belong to the
@@ -52,101 +54,104 @@ namespace csharpcore
         [Fact]
         public void TestDegradingItem()
         {
-            IList<Item> items = new List<Item>
+            var items = new List<(IItem item, DateTime dateCreated)>
             {
-                new DegradingItem
+                (item: new DegradingItem
                 {
-                    Name = "foo", 
+                    Name = "+5 Dexterity Vest", 
                     SellIn = 1, 
                     Quality = 1
-                }
+                }, dateCreated:DateTime.Today)
             };
-            var app = new GildedRose(items);
-            app.UpdateQuality();
-            Assert.Equal(0, items[0].SellIn);
-            Assert.Equal(0, items[0].Quality);
+            var result = GildedRose.UpdateQuality(DateTime.Today.AddDays(1), items).ToList();
+
+            Assert.Equal(0, result[0].SellIn);
+            Assert.Equal(0, result[0].Quality);
         }
 
         // - Once the sell by date has passed, Quality degrades twice as fast
         [Fact]
         public void TestDegradingItemSellDatePassed()
         {
-            IList<Item> items = new List<Item>
+            var items = new List<(IItem item, DateTime dateCreated)>
             {
-                new DegradingItem
+                (item: new DegradingItem
                 {
-                    Name = "foo",
+                    Name = "+5 Dexterity Vest",
                     SellIn = 0,
                     Quality = 2
-                }
+                }, dateCreated:DateTime.Today)
             };
-            var app = new GildedRose(items);
-            app.UpdateQuality();
-            Assert.Equal(0, items[0].Quality);
+
+            var result = GildedRose.UpdateQuality(DateTime.Today.AddDays(1), items).ToList();
+
+            Assert.Equal(0, result[0].Quality);
         }
 
         // - The Quality of an item is never negative
         [Fact]
         public void TestQualityNeverNegative()
         {
-            IList<Item> items = new List<Item>
+            var items = new List<(IItem item, DateTime dateCreated)>
             {
-                new DegradingItem
+                (item: new DegradingItem
                 {
-                    Name = "foo",
+                    Name = "+5 Dexterity Vest",
                     SellIn = 0,
                     Quality = 0
-                },
-                new AgedItem
+                }, dateCreated: DateTime.Today),
+                (item: new AgedItem
                 {
-                    Name = "foo",
+                    Name = "Aged Brie",
                     SellIn = 0,
                     Quality = 0
-                },
-                new LegendaryItem
+                }, dateCreated: DateTime.Today),
+                (item: new LegendaryItem
                 {
-                    Name = "foo",
+                    Name = "Sulfuras, Hand of Ragnaros",
                     SellIn = 0,
                     Quality = 0
-                },
-                new ConcertTicket
+                }, dateCreated: DateTime.Today),
+                (item: new ConcertTicket
                 {
-                    Name = "foo",
+                    Name = "Backstage passes to a TAFKAL80ETC concert",
                     SellIn = 0,
                     Quality = 0
-                },
-                new ConjuredItem
+                }, dateCreated: DateTime.Today),
+                (item: new ConjuredItem
                 {
-                    Name = "foo",
+                    Name = "Conjured Mana Cake",
                     SellIn = 0,
                     Quality = 0
-                }
+                }, dateCreated: DateTime.Today)
             };
-            var app = new GildedRose(items);
-            app.UpdateQuality();
-            Assert.True(items[0].Quality > -1);
-            Assert.True(items[1].Quality > -1);
-            Assert.True(items[2].Quality > -1);
-            Assert.True(items[3].Quality > -1);
-            Assert.True(items[4].Quality > -1);
+
+            var result = GildedRose.UpdateQuality(DateTime.Today.AddDays(1), items).ToList();
+
+            Assert.True(result[0].Quality > -1);
+            Assert.True(result[1].Quality > -1);
+            Assert.True(result[2].Quality > -1);
+            Assert.True(result[3].Quality > -1);
+            Assert.True(result[4].Quality > -1);
         }
 
         // - "Aged Brie" actually increases in Quality the older it gets
         [Fact]
         public void TestAgedItem()
         {
-            IList<Item> items = new List<Item>
+            var items = new List<(IItem item, DateTime dateCreated)>
             {
-                new AgedItem
+                (item: new AgedItem
                 {
-                    Name = "foo",
+                    Name = "Aged Brie",
                     SellIn = 2,
                     Quality = 1
-                }
+                }, dateCreated:DateTime.Today)
             };
-            var app = new GildedRose(items);
-            app.UpdateQuality();
-            Assert.Equal(2, items[0].Quality);
+
+            var result = GildedRose.UpdateQuality(DateTime.Today.AddDays(1), items).ToList();
+
+            Assert.Equal(2, result[0].Quality);
         }
 
         // - The Quality of an item is never more than 50
@@ -154,153 +159,157 @@ namespace csharpcore
         [Fact]
         public void TestQualityNeverGreaterMaxQuality()
         {
-            IList<Item> items = new List<Item>
+            var items = new List<(IItem item, DateTime dateCreated)>
             {
-                new DegradingItem
+                (item: new DegradingItem
                 {
-                    Name = "foo",
+                    Name = "+5 Dexterity Vest",
                     SellIn = 0,
                     Quality = 0
-                },
-                new AgedItem
+                }, dateCreated: DateTime.Today),
+                (item: new AgedItem
                 {
-                    Name = "foo",
+                    Name = "Aged Brie",
                     SellIn = 0,
                     Quality = 0
-                },
-                new ConcertTicket
+                }, dateCreated: DateTime.Today),
+                (item: new ConcertTicket
                 {
-                    Name = "foo",
+                    Name = "Backstage passes to a TAFKAL80ETC concert",
                     SellIn = 0,
                     Quality = 0
-                },
-                new ConjuredItem
+                }, dateCreated: DateTime.Today),
+                (item: new ConjuredItem
                 {
-                    Name = "foo",
+                    Name = "Conjured Mana Cake",
                     SellIn = 0,
                     Quality = 0
-                }
+                }, dateCreated: DateTime.Today)
             };
-            var app = new GildedRose(items);
-            app.UpdateQuality();
-            Assert.True(items[0].Quality <= ShopItem.MaxQuality);
-            Assert.True(items[1].Quality <= ShopItem.MaxQuality);
-            Assert.True(items[2].Quality <= ShopItem.MaxQuality);
-            Assert.True(items[3].Quality <= ShopItem.MaxQuality);
+
+            var result = GildedRose.UpdateQuality(DateTime.Today.AddDays(1), items).ToList();
+
+            Assert.True(result[0].Quality <= 50);
+            Assert.True(result[1].Quality <= 50);
+            Assert.True(result[2].Quality <= 50);
+            Assert.True(result[3].Quality <= 50);
         }
 
         // - "Sulfuras", being a legendary item, never has to be sold or decreases in Quality
         //Just for clarification, an item can never have its Quality increase above 50, however "Sulfuras" is a
         //legendary item and as such its Quality is 80 and it never alters.
         [Fact]
-        public void TestEpicItem()
+        public void TestLegendaryItem()
         {
-            IList<Item> items = new List<Item>
+            var items = new List<(IItem item, DateTime dateCreated)>
             {
-                new LegendaryItem
+                (item: new LegendaryItem
                 {
-                    Name = "foo",
+                    Name = "Sulfuras, Hand of Ragnaros",
                     SellIn = 2,
                     Quality = 1
-                }
+                }, dateCreated:DateTime.Today)
             };
-            var app = new GildedRose(items);
-            app.UpdateQuality();
-            Assert.Equal(2, items[0].SellIn);
-            Assert.Equal(80, items[0].Quality);
+
+            var result = GildedRose.UpdateQuality(DateTime.Today.AddDays(1), items).ToList();
+
+            Assert.Equal(2, result[0].SellIn);
+            Assert.Equal(80, result[0].Quality);
         }
 
         // - "Backstage passes", like aged brie, increases in Quality as its SellIn value approaches;
         [Fact]
         public void TestConcertTicketNormal()
         {
-            IList<Item> items = new List<Item>
+            var items = new List<(IItem item, DateTime dateCreated)>
             {
-                new ConcertTicket
+                (item: new ConcertTicket
                 {
-                    Name = "foo",
+                    Name = "Backstage passes to a TAFKAL80ETC concert",
                     SellIn = 12,
                     Quality = 10
-                }
+                }, dateCreated:DateTime.Today)
             };
-            var app = new GildedRose(items);
-            app.UpdateQuality();
 
-            Assert.Equal(11, items[0].Quality);
+            var result = GildedRose.UpdateQuality(DateTime.Today.AddDays(1), items).ToList();
+
+            Assert.Equal(11, result[0].Quality);
         }
 
         // Quality increases by 2 when there are 10 days or less and by 3 when there are 5 days or less but
         [Fact]
         public void TestConcertTicketCloseSellIn()
         {
-            IList<Item> items = new List<Item>
+            var items = new List<(IItem item, DateTime dateCreated)>
             {
-                new ConcertTicket
+                (item: new ConcertTicket
                 {
-                    Name = "foo",
+                    Name = "Backstage passes to a TAFKAL80ETC concert",
                     SellIn = 9,
                     Quality = 10
-                }
+                }, dateCreated:DateTime.Today)
             };
-            var app = new GildedRose(items);
-            app.UpdateQuality();
 
-            Assert.Equal(12, items[0].Quality);
+            var result = GildedRose.UpdateQuality(DateTime.Today.AddDays(1), items).ToList();
+
+            Assert.Equal(12, result[0].Quality);
         }
 
         // Quality drops to 0 after the concert
         [Fact]
         public void TestConcertTicketVeryCloseSellIn()
         {
-            IList<Item> items = new List<Item>
+            var items = new List<(IItem item, DateTime dateCreated)>
             {
-                new ConcertTicket
+                (item: new ConcertTicket
                 {
-                    Name = "foo",
+                    Name = "Backstage passes to a TAFKAL80ETC concert",
                     SellIn = 4,
                     Quality = 10
-                }
+                }, dateCreated:DateTime.Today)
             };
-            var app = new GildedRose(items);
-            app.UpdateQuality();
 
-            Assert.Equal(13, items[0].Quality);
+            var result = GildedRose.UpdateQuality(DateTime.Today.AddDays(1), items).ToList();
+
+            Assert.Equal(13, result[0].Quality);
         }
 
         // - "Conjured" items degrade in Quality twice as fast as normal items
         [Fact]
         public void TestConjuredItem()
         {
-            IList<Item> items = new List<Item>
+            var items = new List<(IItem item, DateTime dateCreated)>
             {
-                new ConjuredItem
+                (item: new ConjuredItem
                 {
-                    Name = "foo",
+                    Name = "Conjured Mana Cake",
                     SellIn = 1,
                     Quality = 2
-                }
+                }, dateCreated:DateTime.Today)
             };
-            var app = new GildedRose(items);
-            app.UpdateQuality();
-            Assert.Equal(0, items[0].Quality);
+
+            var result = GildedRose.UpdateQuality(DateTime.Today.AddDays(1), items).ToList();
+
+            Assert.Equal(0, result[0].Quality);
         }
 
         // - Once the sell by date has passed, Quality degrades twice as fast
         [Fact]
         public void TestConjuredItemSellDatePassed()
         {
-            IList<Item> items = new List<Item>
+            var items = new List<(IItem item, DateTime dateCreated)>
             {
-                new ConjuredItem
+                (item: new ConjuredItem
                 {
-                    Name = "foo",
+                    Name = "Conjured Mana Cake",
                     SellIn = 0,
                     Quality = 4
-                }
+                }, dateCreated:DateTime.Today)
             };
-            var app = new GildedRose(items);
-            app.UpdateQuality();
-            Assert.Equal(0, items[0].Quality);
+
+            var result = GildedRose.UpdateQuality(DateTime.Today.AddDays(1), items).ToList();
+
+            Assert.Equal(0, result[0].Quality);
         }
     }
 }

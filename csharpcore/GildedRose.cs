@@ -1,46 +1,102 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace csharpcore
 {
-    public class GildedRose
+    public static class GildedRose
     {
-        private readonly IList<Item> _items;
-
-        public GildedRose(IList<Item> items)
+        public static IEnumerable<IItem> UpdateQuality(DateTime date, IEnumerable<(IItem item, DateTime dateCreated)> items)
         {
-            _items = items;
+            return items
+                .Select(i =>
+                {
+                    var (item, dateCreated) = i;
+                    var timeSpan = date - dateCreated;
+
+                    return item switch
+                    {
+                        IDegradingItem degradingItem => CalcDegradingItem(degradingItem, timeSpan),
+                        IAgedItem agedItem => CalcAgedItem(agedItem, timeSpan),
+                        ILegendaryItem legendaryItem => CalcLegendaryItem(legendaryItem),
+                        IConcertTicket concertTicket => CalcConcertTicket(concertTicket, timeSpan),
+                        IConjuredItem conjuredItem => CalcConjuredItem(conjuredItem, timeSpan),
+                        _ => item // throw new InvalidOperationException()
+                    };
+                });
         }
 
-        public void UpdateQuality()
+        private static int Clamp(int value, int min, int max)
         {
-            foreach (var item in _items)
+            return Math.Max(min, Math.Min(value, max));
+        }
+
+        private static IItem CalcDegradingItem(IItem item, TimeSpan timeSpan)
+        {
+            var days = timeSpan.Days;
+            var daysRange = Enumerable.Range(item.SellIn - days, Math.Max(0, days)).ToList();
+            var daysBeforeSellInIsZero = Enumerable.Range(0, item.SellIn).Intersect(daysRange).Count();
+            var daysAfterSellInIsZero = Enumerable.Range(-days, days).Intersect(daysRange).Count();
+            return new DegradingItem
             {
-                if (item is LegendaryItem legendaryItem)
-                {
-                    legendaryItem.IamLegend();
-                    continue;
-                }
+                Name = item.Name,
+                SellIn = item.SellIn - days,
+                Quality = Clamp(item.Quality - daysBeforeSellInIsZero - daysAfterSellInIsZero * 2, 0, 50)
+            };
+        }
 
-                if(!(item is ShopItem shopItem))
-                {
-                    continue;
-                }
+        private static IItem CalcAgedItem(IItem item, TimeSpan timeSpan)
+        {
+            var days = timeSpan.Days;
+            var daysRange = Enumerable.Range(item.SellIn - days, Math.Max(0, days)).ToList();
+            var daysBeforeSellInIsZero = Enumerable.Range(0, item.SellIn).Intersect(daysRange).Count();
+            var daysAfterSellInIsZero = Enumerable.Range(-days, days).Intersect(daysRange).Count();
+            return new AgedItem
+            {
+                Name = item.Name,
+                SellIn = item.SellIn - days,
+                Quality = Clamp(item.Quality + daysBeforeSellInIsZero + daysAfterSellInIsZero * 2, 0, 50)
+            };
+        }
 
-                shopItem.DecreaseSellIn();
+        private static IItem CalcLegendaryItem(IItem item)
+        {
+            return new LegendaryItem
+            {
+                Name = item.Name,
+                SellIn = item.SellIn,
+                Quality = 80
+            };
+        }
 
-                switch (shopItem)
-                {
-                    case DegradingItem degradingItem:
-                        degradingItem.DecreaseQuality();
-                        break;
-                    case AgedItem agedItem:
-                        agedItem.AgeFurther();
-                        break;
-                    case ConcertTicket concertTicket:
-                        concertTicket.IncreaseQuality();
-                        break;
-                }
-            }
+        private static IItem CalcConcertTicket(IItem item, TimeSpan timeSpan)
+        {
+            var days = timeSpan.Days;
+            var daysRange = Enumerable.Range(item.SellIn - days, Math.Max(0, days)).ToList();
+            var daysBeforeCloseSellIn = Enumerable.Range(11, Math.Max(0, item.SellIn - 11)).Intersect(daysRange).Count();
+            var daysDuringCloseSellIn = Enumerable.Range(6, 5).Intersect(daysRange).Count();
+            var daysDuringVeryCloseSellIn = Enumerable.Range(0, 5).Intersect(daysRange).Count();
+            var daysAfterSellInIsZero = Enumerable.Range(-days, days).Intersect(daysRange).Count();
+            return new ConcertTicket
+            {
+                Name = item.Name,
+                SellIn = item.SellIn - days,
+                Quality = daysAfterSellInIsZero > 0 ? 0 : Clamp(item.Quality + daysBeforeCloseSellIn + daysDuringCloseSellIn * 2 + daysDuringVeryCloseSellIn * 3, 0, 50)
+            };
+        }
+
+        private static IItem CalcConjuredItem(IItem item, TimeSpan timeSpan)
+        {
+            var days = timeSpan.Days;
+            var daysRange = Enumerable.Range(item.SellIn - days, Math.Max(0, days)).ToList();
+            var daysBeforeSellInIsZero = Enumerable.Range(0, item.SellIn).Intersect(daysRange).Count();
+            var daysAfterSellInIsZero = Enumerable.Range(-days, days).Intersect(daysRange).Count();
+            return new ConjuredItem
+            {
+                Name = item.Name,
+                SellIn = item.SellIn - days,
+                Quality = Clamp(item.Quality - daysBeforeSellInIsZero * 2 - daysAfterSellInIsZero * 4, 0, 50)
+            };
         }
     }
 }
